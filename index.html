@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roteiro 2027 — Florença • Milão • Interlaken • Zurique</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <h1 id="mainTitle" class="editable-static" contenteditable="true">Roteiro 2027 · Florença → Milão → Interlaken → Zurique</h1>
+      <p id="mainSubtitle" class="editable-static" contenteditable="true">10 a 21 de agosto de 2027</p>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="exportData()">Exportar dados</button>
+      <label class="btn" for="importFile">Importar</label><input id="importFile" type="file" accept="application/json" hidden>
+      <button class="btn" onclick="window.print()">Imprimir / PDF</button>
+      <button class="btn primary" onclick="saveAll(true)">Salvar agora</button>
+      <span id="cloudStatus" class="cloud-status" title="Status do salvamento online">Preparando online…</span>
+    </div>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+
+<main>
+<section id="overview" class="tab active">
+  <div class="grid g3">
+    <div class="card"><div class="tiny">Dias do roteiro</div><div class="kpi"><b id="daysCount">12</b><span class="badge info">10–21/08</span></div><p class="muted">Florença/Toscana, Milão, Interlaken, região Jungfrau e Zurique.</p></div>
+    <div class="card"><div class="tiny">Bases</div><div class="kpi"><b id="basesCount">4</b><span class="badge">Florença · Milão · Interlaken · Zurique</span></div><p class="muted">Interlaken como base dos Alpes.</p></div>
+    <div class="card"><div class="tiny">Progresso geral</div><div class="kpi"><b id="progressText">0%</b></div><div class="progress"><div id="progressBar"></div></div><p class="tiny">Calculado a partir do checklist.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2>Resumo da viagem</h2>
+    <div id="overviewRoutes"></div>
+    <div class="editor-tools"><button class="btn primary small" onclick="addRoute()">+ Adicionar dia/resumo</button></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h3>Estratégia geral de compra</h3>
+      <div class="timeline">
+        <div class="tl"><h4>Agora</h4><p>Manter hotéis com cancelamento gratuito nas melhores localizações.</p></div>
+        <div class="tl"><h4>Fev/2027</h4><p>Começar a vigiar os trens de agosto/2027 assim que as janelas de venda abrirem.</p></div>
+        <div class="tl"><h4>Quando Jungfrau publicar verão 2027</h4><p>Refazer a conta: Half Fare × Jungfrau Travel Pass × bilhetes individuais.</p></div>
+        <div class="tl"><h4>Perto da viagem</h4><p>Jungfraujoch conforme previsão do tempo e confirmação das reservas.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Configuração</h3>
+      <div class="form-row"><label>Viajantes</label><input class="lockable" data-bind="settings.travelers" type="number" min="1" value="4"></div>
+      <div class="form-row"><label>Orçamento-alvo (R$)</label><input class="lockable" data-bind="settings.budget" type="number" min="0" step="100" value="20000"></div>
+      <div class="form-row"><label>Notas gerais</label><textarea class="lockable" data-bind="settings.notes" placeholder="Prioridades, documentos, observações..."></textarea></div>
+    </div>
+  </div>
+</section>
+
+<section id="calendar" class="tab">
+  <div class="card">
+    <h2>Calendário · Agosto de 2027</h2>
+    <p class="muted">Clique diretamente no texto de qualquer evento para editar. Use “+ evento” para adicionar e “×” para excluir.</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px">
+      <span class="badge" style="background:#4285f4;color:#fff">Folga casamento</span>
+      <span class="badge" style="background:#0f9d8a;color:#fff">Folga eleitoral</span>
+      <span class="badge" style="background:#b21a52;color:#fff">Voos</span>
+      <span class="badge" style="background:#f59e0b;color:#fff">Casamento civil</span>
+      <span class="badge" style="background:#d81b60;color:#fff">Casamento</span>
+      <span class="badge" style="background:#e10600;color:#fff">Roteiro</span>
+    </div>
+    <div class="calendar" id="calendarGrid"></div>
+  </div>
+</section>
+
+<section id="hotels" class="tab">
+  <div class="grid g3" id="hotelGrid"></div>
+  <div class="editor-tools"><button class="btn primary" onclick="addHotel()">+ Adicionar hotel</button></div>
+</section>
+
+<section id="transport" class="tab">
+  <div class="card">
+    <h2>Trens, passes e ingressos</h2>
+    <p class="muted">Controle status, preço, fornecedor, código da reserva e link.</p>
+    <div class="table-wrap"><table id="transportTable">
+      <thead><tr><th>Item</th><th>Data</th><th>Status</th><th>Preço</th><th>Moeda</th><th>Fornecedor</th><th>Reserva</th><th>Link</th><th>Notas</th><th class="edit-only">Editar</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <div class="editor-tools"><button class="btn primary" onclick="addTransport()">+ Adicionar transporte/ingresso</button></div>
+  </div>
+</section>
+
+<section id="itinerary" class="tab">
+  <div class="grid" id="itineraryGrid"></div>
+  <div class="editor-tools"><button class="btn primary" onclick="addItineraryDay()">+ Adicionar novo dia</button></div>
+</section>
+
+<section id="expenses" class="tab">
+  <div class="card">
+    <h2>Planilha de gastos</h2>
+    <div class="expense-summary">
+      <div class="sum-box"><div class="tiny">Total estimado</div><b id="expenseTotal">R$ 0,00</b></div>
+      <div class="sum-box"><div class="tiny">Pago</div><b id="expensePaid">R$ 0,00</b></div>
+      <div class="sum-box"><div class="tiny">Restante</div><b id="expenseRemaining">R$ 0,00</b></div>
+      <div class="sum-box"><div class="tiny">Orçamento</div><b id="budgetText">R$ 0,00</b></div>
+    </div>
+    <div class="grid g3" style="margin:16px 0">
+      <div><label class="tiny">1 EUR em BRL</label><input class="lockable" data-bind="rates.EUR" type="number" step=".01" value="6.50"></div>
+      <div><label class="tiny">1 CHF em BRL</label><input class="lockable" data-bind="rates.CHF" type="number" step=".01" value="6.80"></div>
+      <div><label class="tiny">1 USD em BRL</label><input class="lockable" data-bind="rates.USD" type="number" step=".01" value="5.60"></div>
+    </div>
+    <div class="table-wrap" style="width:100%"><table id="expenseTable">
+      <thead><tr><th>Data</th><th>Categoria</th><th>Descrição</th><th>Qtd.</th><th>Valor unit.</th><th>Moeda</th><th>Total R$</th><th>Pago?</th><th>Observação</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <div class="editor-tools"><button class="btn primary" onclick="addExpense()">+ Adicionar gasto</button></div>
+  </div>
+</section>
+
+<section id="strategies" class="tab">
+  <div class="card">
+    <h2>Estratégias de compra, descontos e economia</h2>
+    <p class="muted">Referência verificada em 11/10/2026. Promoções e preços podem mudar até 2027; datas marcadas como estimativa não garantem a abertura da grade.</p>
+    <div id="strategyGrid" style="margin-top:10px"></div>
+    <div class="editor-tools"><button class="btn primary" onclick="addStrategy()">+ Adicionar estratégia</button></div>
+  </div>
+</section>
+
+<section id="photos" class="tab">
+  <div class="card">
+    <div class="photo-toolbar">
+      <div>
+        <h2>Fotos dos lugares do roteiro</h2>
+        <p class="muted" style="margin:0">Pontos turísticos em ordem cronológica, com data e imagem de referência para você reconhecer cada lugar.</p>
+      </div>
+      <button class="btn primary" onclick="addPhoto()">+ Adicionar lugar</button>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+</section>
+
+<section id="checklist" class="tab">
+  <div class="card">
+    <h2>Checklist final</h2>
+    <div class="checklist" id="checklistGrid"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <input id="newChecklistText" placeholder="Novo item do checklist">
+      <button class="btn primary" onclick="addChecklist()">+ Adicionar</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<dialog id="photoModal" class="photo-dialog" aria-labelledby="photoModalTitle">
+  <div class="photo-modal-head">
+    <div><h3 id="photoModalTitle">Adicionar lugar</h3><p>Inclua um novo ponto na aba Fotos.</p></div>
+    <button class="photo-modal-close" type="button" onclick="closePhotoModal()" aria-label="Fechar">×</button>
+  </div>
+  <form id="photoModalForm" onsubmit="savePhotoFromModal(event)">
+    <div class="photo-modal-body">
+      <div id="photoModalError" class="photo-modal-error"></div>
+      <div class="photo-field"><label for="photoDateInput">Data</label><input id="photoDateInput" inputmode="numeric" autocomplete="off" placeholder="Ex.: 18/08" maxlength="10" required><div class="hint">Use DD/MM ou DD/MM/AAAA.</div></div>
+      <div class="photo-field"><label for="photoTitleInput">Nome do local</label><input id="photoTitleInput" autocomplete="off" placeholder="Ex.: Harder Kulm" required></div>
+      <div class="photo-field"><label for="photoImageInput">URL da imagem</label><input id="photoImageInput" type="url" inputmode="url" autocomplete="off" placeholder="https://..." required><div class="hint">Cole o endereço direto de uma imagem (JPG, PNG, WebP etc.).</div></div>
+    </div>
+    <div class="photo-modal-actions"><button class="btn" type="button" onclick="closePhotoModal()">Cancelar</button><button class="btn primary" type="submit">Adicionar lugar</button></div>
+  </form>
+</dialog>
+<script src="/core.js"></script>
+<script src="/default-b.js"></script>
+<script src="/ui-a.js"></script>
+<script src="/ui-b.js"></script>
+</body>
+</html>
